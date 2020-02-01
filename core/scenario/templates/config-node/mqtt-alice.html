@@ -1,0 +1,47 @@
+<!--
+  Copyright JS Foundation and other contributors, http://js.foundation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType('mqtt-alice-broker',{
+        category: 'config',
+        defaults: {
+            name: {value:"ProjectAliceMqttBroker"},
+            broker: {value:"127.0.0.1"},
+            port: {value:1883},
+            usetls: {value: false},
+            tls: {type:"tls-config",required: false},
+            clientid: {value:""},
+            verifyservercert: { value: false},
+            compatmode: { value: false},
+            keepalive: {value: 60},
+            cleansession: {value: true},
+            birthTopic: {value:""},
+            birthQos: {value:"0"},
+            birthRetain: {value:false},
+            birthPayload: {value:""},
+            closeTopic: {value:""},
+            closeQos: {value:"0"},
+            closeRetain: {value:false},
+            closePayload: {value:""},
+            willTopic: {value:""},
+            willQos: {value:"0"},
+            willRetain: {value:false},
+            willPayload: {value:""}
+        },
+        credentials: {
+            user: {type:"text"},
+            password: {type: "password"}
+        },
+        label: "ProjectAliceMqttBroker"
+    });
+</script>

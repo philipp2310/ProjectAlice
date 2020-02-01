@@ -1,0 +1,52 @@
+module.exports = function(RED) {
+    "use strict";
+
+    function MQTTAliceOutNode(config) {
+        RED.nodes.createNode(this,config);
+        this.topic = config.topic;
+        this.qos = config.qos;
+		this.retain = config.retain;
+		// use any available mqtt alice broker since there is only one anyways
+		/*var broker = ""
+		RED.nodes.eachNode(function(node) {
+			if (node.type === 'mqtt-alice-broker') {
+				broker = node.id
+			}
+		});*/
+		this.broker = config.broker
+		this.brokerConn = RED.nodes.getNode(this.broker);
+		var node = this;
+
+        if (this.brokerConn) {
+            this.status({fill:"red",shape:"ring",text:"node-red:common.status.disconnected"});
+            this.on("input",function(msg,send,done) {
+                msg.qos = node.qos;
+                msg.retain = node.retain || msg.retain || false;
+                msg.retain = ((msg.retain === true) || (msg.retain === "true")) || false;
+                if (node.topic) {
+                    msg.topic = node.topic;
+                }
+                if ( msg.hasOwnProperty("payload")) {
+                    if (msg.hasOwnProperty("topic") && (typeof msg.topic === "string") && (msg.topic !== "")) { // topic must exist
+                        this.brokerConn.publish(msg, done);  // send the message
+                    } else {
+                        node.warn(RED._("mqtt-alice.errors.invalid-topic"));
+                        done();
+                    }
+                } else {
+                    done();
+                }
+            });
+            if (this.brokerConn.connected) {
+                node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+            }
+            node.brokerConn.register(node);
+            this.on('close', function(done) {
+                node.brokerConn.deregister(node,done);
+            });
+        } else {
+            this.error(RED._("mqtt-alice.errors.missing-config"));
+        }
+    }
+    RED.nodes.registerType("broadcast {{ event_name }}",MQTTAliceOutNode);
+};

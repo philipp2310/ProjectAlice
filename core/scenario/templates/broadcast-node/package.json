@@ -1,0 +1,22 @@
+{
+	"name": "node-red-contrib-mqtt-alice",
+	"version": "0.0.1",
+	"description": "MQTT Node with persistent message storage",
+	"scripts": {
+	  "test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Max Bachmann",
+	"license": "GPL-3.0",
+	"keywords": [ "node-red", "mqtt" ],
+	"node-red": {
+	  "nodes": {
+		"broadcast-node": "broadcast-node.js"
+	  }
+	},
+	"dependencies": {
+	  "fs-extra": "8.1.0",
+	  "https-proxy-agent": "2.2.4",
+	  "is-utf8": "0.2.1",
+	  "mqtt": "2.18.8"
+	}
+}

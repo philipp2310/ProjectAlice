@@ -1,0 +1,25 @@
+<script type="text/x-red" data-template-name="broadcast {{ event_name }}">
+    <div class="form-row">
+        <label for="node-input-broker"><i class="fa fa-globe"></i> <span data-i18n="mqtt-alice.label.broker"></span></label>
+        <input type="text" id="node-input-broker">
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('broadcast {{ event_name }}',{
+        category: 'ProjectAlice',
+        defaults: {
+			topic: {value: '{{ event_name }}'},
+			qos: {value: 2},
+            retain: {value: 'false'},
+            broker: {type:"mqtt-alice-broker", required:true}
+        },
+        color:"#d8bfd8",
+        inputs:1,
+        outputs:0,
+        icon: "bridge.svg",
+        align: "right",
+        label: "broadcast event",
+        labelStyle: "node_label_italic"
+    });
+</script>

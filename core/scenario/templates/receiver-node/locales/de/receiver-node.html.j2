@@ -1,0 +1,6 @@
+{%- macro sentence_case(text) %}
+    {{ text[0]|upper}}{{text[1:] }}
+{% endmacro -%}
+<script type="text/x-red" data-help-name="on{{ sentence_case(event_name) }}">
+{{ description_de }}
+</script>

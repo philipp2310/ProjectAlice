@@ -1,0 +1,61 @@
+{%- macro sentence_case(text) %}
+    {{ text[0]|upper}}{{text[1:] }}
+{% endmacro -%}
+module.exports = function(RED) {
+    "use strict";
+    var isUtf8 = require('is-utf8');
+
+    function MQTTAliceInNode(config) {
+        RED.nodes.createNode(this,config);
+        this.topic = config.topic;
+		this.qos = config.qos;
+		// use any available mqtt alice broker since there is only one anyways
+		this.broker = config.broker
+		/*console.log(RED)
+		RED.nodes.eachNode(function(node) {
+			if (node.type === 'mqtt-alice-broker') {
+				broker = node.id
+			}
+			console.log(node)
+		});
+		this.broker = broker*/
+        this.brokerConn = RED.nodes.getNode(this.broker);
+		var node = this;
+
+        if (this.brokerConn) {
+            this.status({fill:"red",shape:"ring",text:"node-red:common.status.disconnected"});
+            if (this.topic) {
+                node.brokerConn.register(this);
+                this.brokerConn.subscribe(this.topic,this.qos,function(topic,payload,packet) {
+                    if (isUtf8(payload)) {
+                        payload = payload.toString();
+                        try { payload = JSON.parse(payload); }
+                        catch(e) { node.error(RED._("mqtt-alice.errors.invalid-json-parse"),{payload:payload, topic:topic, qos:packet.qos, retain:packet.retain}); return; }
+                    }
+                    else { node.error((RED._("mqtt-alice.errors.invalid-json-string")),{payload:payload, topic:topic, qos:packet.qos, retain:packet.retain}); return; }
+
+                    var msg = {topic:topic, payload:payload, qos:packet.qos, retain:packet.retain};
+                    if ((node.brokerConn.broker === "localhost")||(node.brokerConn.broker === "127.0.0.1")) {
+                        msg._topic = topic;
+                    }
+                    node.send(msg);
+                }, this.id);
+                if (this.brokerConn.connected) {
+                    node.status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+                }
+            }
+            else {
+                this.error(RED._("mqtt-alice.errors.not-defined"));
+            }
+            this.on('close', function(removed, done) {
+                if (node.brokerConn) {
+                    node.brokerConn.unsubscribe(node.topic,node.id, removed);
+                    node.brokerConn.deregister(node,done);
+                }
+            });
+        } else {
+            this.error(RED._("mqtt-alice.errors.missing-config"));
+        }
+    }
+    RED.nodes.registerType("on{{ sentence_case(event_name) }}",MQTTAliceInNode);
+};
